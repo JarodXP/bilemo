@@ -2,7 +2,7 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.4.*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "symfony/console": "5.1.*",
@@ -12,13 +12,17 @@
         "symfony/yaml": "5.1.*"
     },
     "require-dev": {
+        "symfony/profiler-pack": "^1.0"
     },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.*"
+        }
     },
     "autoload": {
         "psr-4": {
