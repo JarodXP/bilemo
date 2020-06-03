@@ -1,6 +1,8 @@
-###> PHPStorm ###
+###> IDE ###
 /.idea/*
-###< PHPStorm ###
+**/.php_cs.cache
+###< IDE ###
+
 
 
 ###> symfony/framework-bundle ###
@@ -12,3 +14,5 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+
