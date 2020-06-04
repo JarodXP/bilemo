@@ -1,9 +1,8 @@
 ###> IDE ###
 /.idea/*
 **/.php_cs.cache
+/phpDocumentor.phar
 ###< IDE ###
-
-
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -14,5 +13,3 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
-
-
