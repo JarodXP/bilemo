@@ -1,7 +1,8 @@
-###> PHPStorm ###
+###> IDE ###
 /.idea/*
-###< PHPStorm ###
-
+**/.php_cs.cache
+/phpDocumentor.phar
+###< IDE ###
 
 ###> symfony/framework-bundle ###
 /.env.local
