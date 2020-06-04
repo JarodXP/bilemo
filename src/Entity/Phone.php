@@ -6,6 +6,9 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -21,28 +24,47 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 50,
+     *     minMessage = "The phone name length must be up to 2 characters",
+     *     maxMessage = "The phone name length must be less than 50 characters")
      */
     private string $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 3,
+     *     max = 50,
+     *     minMessage = "The supplier name length must be up to 3 characters",
+     *     maxMessage = "The supplier name length must be less than 50 characters")
      */
     private string $supplier;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 50,
+     *     minMessage = "The reference length must be up to 2 characters",
+     *     maxMessage = "The reference name length must be less than 50 characters")
      */
     private string $productReference;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 5,
+     *     max = 50,
+     *     minMessage = "The color length must be up to 2 characters",
+     *     maxMessage = "The color length must be less than 50 characters")
      */
     private string $color;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private string $pictureFileName;
 
     /**
      * @ORM\Column(type="array")

@@ -8,6 +8,9 @@ use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
@@ -23,51 +26,106 @@ class Company
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 50,
+     *     minMessage = "The company name length must be up to 1 character",
+     *     maxMessage = "The company name length must be less than 50 characters")
      */
     private string $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *     min = 8,
+     *     max = 20,
+     *     minMessage = "The password length must be up to 8 characters",
+     *     maxMessage = "The company name length must be less than 20 characters")
      */
     private string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email."
+     * )
      */
     private string $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Regex(
+     *     pattern="~^\+[0-9]{1,4}[\(0-9{1,10}\)]?[0-9]{4,30}$~",
+     *     message="{value} is not a valid phone number.")
      */
     private string $phoneNumber;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(
+     *     min = 1,
+     *     max = 20,
+     *     minMessage = "The street number length must be up to 8 characters",
+     *     maxMessage = "The street number length must be less than 20 characters")
      */
+
     private string $streetNumber;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 50,
+     *     minMessage = "The street name length must be up to 2 characters",
+     *     maxMessage = "The street name length must be less than 50 characters")
      */
     private string $streetName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 3,
+     *     max = 50,
+     *     minMessage = "The postcode length must be up to 3 characters",
+     *     maxMessage = "The postcode length must be less than 50 characters")
      */
     private string $postCode;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 50,
+     *     minMessage = "The city name length must be up to 2 characters",
+     *     maxMessage = "The city name length must be less than 50 characters")
      */
     private string $city;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 5,
+     *     max = 50,
+     *     minMessage = "The country name length must be up to 5 characters",
+     *     maxMessage = "The country name length must be less than 50 characters")
      */
     private string $country;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 5,
+     *     max = 50,
+     *     minMessage = "The VAT number length must be up to 5 characters",
+     *     maxMessage = "The VAT number length must be less than 50 characters")
      */
     private string $vatNumber;
 
