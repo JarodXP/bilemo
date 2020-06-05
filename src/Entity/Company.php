@@ -136,7 +136,7 @@ class Company implements UserInterface
     private Collection $users;
 
     /**
-     * @ORM\Column(type="simple_array")
+     * @ORM\Column(type="simple_array", nullable=true)
      * @var array
      */
     private array $roles = [];

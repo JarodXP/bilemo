@@ -1,5 +1,5 @@
 #!/bin/bash
 
 #Resets the database
-rm -f var/data.db
+rm -f var/bilemo.db
 php bin/console doctrine:database:create

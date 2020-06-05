@@ -17,6 +17,8 @@
         "symfony/yaml": "5.1.*"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
+        "fzaninotto/faker": "^1.9",
         "symfony/maker-bundle": "^1.19",
         "symfony/profiler-pack": "^1.0"
     },
