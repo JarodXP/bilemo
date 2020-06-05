@@ -12,3 +12,6 @@ hooks:
     - location: scripts/permissions.sh
       timeout: 300
       runas: root
+    - location: scripts/init-project-deploy.sh
+      timeout: 300
+      runas: root
