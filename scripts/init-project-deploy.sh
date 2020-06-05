@@ -10,4 +10,4 @@ fi
 cd "/var/www/${directory}" || exit
 
 #Calls the scripts for initialization
-source "scripts/reset-project.sh"
+source "scripts/reset-project-deploy.sh"
