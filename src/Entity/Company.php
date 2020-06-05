@@ -8,6 +8,7 @@ use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
@@ -15,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Length;
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
  */
-class Company
+class Company implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -133,6 +134,12 @@ class Company
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="company", orphanRemoval=true)
      */
     private Collection $users;
+
+    /**
+     * @ORM\Column(type="simple_array")
+     * @var array
+     */
+    private array $roles = [];
 
     public function __construct()
     {
@@ -293,5 +300,37 @@ class Company
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRoles()
+    {
+        $roles = $this->roles;
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_COMPANY';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSalt()
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUsername()
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function eraseCredentials()
+    {
     }
 }
