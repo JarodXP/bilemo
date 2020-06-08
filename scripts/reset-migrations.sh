@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo 'script is launched'
-
 #Resets migrations files
 rm -r src/Migrations/*
 
