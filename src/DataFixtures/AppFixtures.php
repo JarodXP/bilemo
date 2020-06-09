@@ -27,7 +27,7 @@ class AppFixtures extends Fixture
             'Apple', 'Samsung', 'Xiaomi', 'Huawei', 'Crosscall', 'Nokia', 'LG'
         ];
 
-        $features = [
+        $featuresSet = [
             'Battery', 'Screen Size', 'Screen Resolution', 'Camera', 'Memory RAM'
         ];
 
@@ -43,7 +43,7 @@ class AppFixtures extends Fixture
                 ->setColor($faker->colorName)
                 ->setProductReference($faker->randomLetter.$faker->randomNumber(7));
 
-            foreach ($features as $feature) {
+            foreach ($featuresSet as $feature) {
                 $features[$feature] = $this->setFeatureValue($feature);
             }
 

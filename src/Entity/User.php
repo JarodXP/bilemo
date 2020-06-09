@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use DateTime;
+use App\Entity\Company;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Length;
+use App\Repository\UserRepository;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
-
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -24,6 +25,7 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"users-list"})
      */
     private int $id;
 
@@ -43,6 +45,7 @@ class User
      *     max = 50,
      *     minMessage = "The first name length must be up to 1 characters",
      *     maxMessage = "The first name length must be less than 50 characters")
+     * @Groups({"users-list"})
      */
     private string $firstName;
 
@@ -54,6 +57,7 @@ class User
      *     max = 50,
      *     minMessage = "The last name length must be up to 1 characters",
      *     maxMessage = "The last name length must be less than 50 characters")
+     * @Groups({"users-list"})
      */
     private string $lastName;
 
@@ -62,6 +66,7 @@ class User
      * @Assert\Regex(
      *     pattern="~^\+[0-9]{1,4}[\(0-9{1,10}\)]?[0-9]{4,30}$~",
      *     message="{value} is not a valid phone number.")
+     *
      */
     private string $phoneNumber;
 
@@ -75,6 +80,7 @@ class User
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\NotNull
+     * @Groups({"users-list"})
      */
     private Company $company;
 

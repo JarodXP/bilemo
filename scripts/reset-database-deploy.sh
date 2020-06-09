@@ -2,4 +2,4 @@
 
 #Resets the database
 php bin/console doctrine:query:sql "DROP DATABASE IF EXISTS bilemo"
-php bin/console doctrine:database:create
+php bin/console doctrine:database:create --no-interaction

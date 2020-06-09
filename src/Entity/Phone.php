@@ -124,18 +124,6 @@ class Phone
         return $this;
     }
 
-    public function getPictureFileName(): ?string
-    {
-        return $this->pictureFileName;
-    }
-
-    public function setPictureFileName(string $pictureFileName): self
-    {
-        $this->pictureFileName = $pictureFileName;
-
-        return $this;
-    }
-
     public function getFeatures(): ?array
     {
         return $this->features;
