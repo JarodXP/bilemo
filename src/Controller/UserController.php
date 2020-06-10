@@ -37,7 +37,12 @@ class UserController extends AbstractController
      */
     public function userDetails(User $user)
     {
-        return $this->json($user, 200, [], ['groups' => 'users-list']);
+        $response = [
+            'hypermedia' => 'There will be some links',
+            'user details' => $user
+        ];
+
+        return $this->json($response, 200, [], ['groups' => 'user-details']);
     }
 
     /**
