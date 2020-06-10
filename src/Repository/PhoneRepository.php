@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Phone;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Phone|null find($id, $lockMode = null, $lockVersion = null)
@@ -20,33 +21,34 @@ class PhoneRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Phone::class);
     }
-
-    // /**
-    //  * @return Phone[] Returns an array of Phone objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    
+    /**
+     * findPaginatedList
+     * Gets a list of phones paginated
+     * @param mixed $page
+     * @param mixed $limit
+     * @return Paginator
+     */
+    public function findPaginatedList(int $page = null, int $limit = null):Paginator
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        //Sets default params value
+        if ($page == null) {
+            $page = 1;
+        }
 
-    /*
-    public function findOneBySomeField($value): ?Phone
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if ($limit == null) {
+            $limit = 5;
+        }
+
+        //Builds query
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        $queryBuilder
+            ->select('p')
+            ->setFirstResult(($page-1)*$limit)
+            ->setMaxResults($limit)
+            ->orderBy('p.name');
+
+        return new Paginator($queryBuilder->getQuery());
     }
-    */
 }
