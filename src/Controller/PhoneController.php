@@ -26,7 +26,7 @@ class PhoneController extends AbstractController
             'hypermedia' => 'There will be some links',
             'page' => $page,
             'limit' => $limit,
-            'phones' => $repo->findPaginatedList($page, $limit)
+            'phones' => $repo->findPhoneList($page, $limit)
         ];
 
         return $this->json($response, 200, [], ['groups' => 'phone-list']);
