@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use App\Repository\PhoneRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -19,6 +20,7 @@ class Phone
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"phone-list", "phone-details"})
      */
     private int $id;
 
@@ -30,6 +32,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The phone name length must be up to 2 characters",
      *     maxMessage = "The phone name length must be less than 50 characters")
+     * @Groups({"phone-list", "phone-details"})
      */
     private string $name;
 
@@ -41,6 +44,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The supplier name length must be up to 3 characters",
      *     maxMessage = "The supplier name length must be less than 50 characters")
+     * @Groups({"phone-list", "phone-details"})
      */
     private string $supplier;
 
@@ -52,6 +56,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The reference length must be up to 2 characters",
      *     maxMessage = "The reference name length must be less than 50 characters")
+     * @Groups({"phone-list", "phone-details"})
      */
     private string $productReference;
 
@@ -63,11 +68,13 @@ class Phone
      *     max = 50,
      *     minMessage = "The color length must be up to 2 characters",
      *     maxMessage = "The color length must be less than 50 characters")
+     * @Groups({"phone-list", "phone-details"})
      */
     private string $color;
 
     /**
      * @ORM\Column(type="array")
+     * @Groups({"phone-details"})
      */
     private array $features = [];
 
