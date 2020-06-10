@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -14,11 +15,21 @@ class UserController extends AbstractController
     /**
      *@Route("/api/users", name="api_users_list", methods={"GET"})
      */
-    public function usersList()
+    public function usersList(Request $request)
     {
+        $page = (int) $request->query->get('page');
+        $limit = (int) $request->query->get('limit');
+
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
-        return $this->json($repo->findAll(), 200, [], ['groups' => 'users-list']);
+        $response = [
+            'hypermedia' => 'There will be some links',
+            'page' => $page,
+            'limit' => $limit,
+            'phones' => $repo->findUserList($page, $limit)
+        ];
+
+        return $this->json($response, 200, [], ['groups' => 'users-list']);
     }
 
     /**

@@ -25,7 +25,7 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"users-list"})
+     * @Groups({"users-list", "user-details"})
      */
     private int $id;
 
@@ -34,6 +34,7 @@ class User
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )
+     * @Groups({"user-details"})
      */
     private string $email;
 
@@ -45,7 +46,7 @@ class User
      *     max = 50,
      *     minMessage = "The first name length must be up to 1 characters",
      *     maxMessage = "The first name length must be less than 50 characters")
-     * @Groups({"users-list"})
+     * @Groups({"users-list", "user-details"})
      */
     private string $firstName;
 
@@ -57,7 +58,7 @@ class User
      *     max = 50,
      *     minMessage = "The last name length must be up to 1 characters",
      *     maxMessage = "The last name length must be less than 50 characters")
-     * @Groups({"users-list"})
+     * @Groups({"users-list", "user-details"})
      */
     private string $lastName;
 
@@ -72,7 +73,7 @@ class User
 
     /**
      * @ORM\Column(type="datetime")
-     *
+     * @Groups({"user-details"})
      */
     private DateTime $dateAdded;
 
@@ -80,7 +81,7 @@ class User
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="users")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\NotNull
-     * @Groups({"users-list"})
+     * @Groups({"user-details"})
      */
     private Company $company;
 
