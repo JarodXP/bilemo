@@ -93,7 +93,7 @@ class UserController extends AbstractController
             }
 
             throw new Exception(json_encode($errorMessages));
-        };
+        }
 
         //Sets the company
         $user->setCompany($company);

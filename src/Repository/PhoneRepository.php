@@ -34,6 +34,6 @@ class PhoneRepository extends ServiceEntityRepository
      */
     public function findPhoneList(int $page = null, int $limit = null):Paginator
     {
-        return $this->findPaginatedList($page, $limit, 'p', 'name');
+        return $this->findPaginatedList('p', 'name', $page, $limit);
     }
 }

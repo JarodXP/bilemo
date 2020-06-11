@@ -17,7 +17,7 @@ trait Lister
      * @param string $orderField
      * @return Paginator
      */
-    protected function findPaginatedList(int $page = null, int $limit = null, string $tableAlias, string $orderField):Paginator
+    protected function findPaginatedList(string $tableAlias, string $orderField, int $page = null, int $limit = null):Paginator
     {
         //Sets default params value
         if ($page == null) {

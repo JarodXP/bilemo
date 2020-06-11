@@ -34,6 +34,6 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findUserList(int $page = null, int $limit = null):Paginator
     {
-        return $this->findPaginatedList($page, $limit, 'u', 'lastName');
+        return $this->findPaginatedList('u', 'lastName', $page, $limit);
     }
 }
