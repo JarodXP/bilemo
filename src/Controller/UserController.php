@@ -108,7 +108,7 @@ class UserController extends AbstractController
             'user' => $user
         ];
         
-        return $this->json($response, 201, ['charset' => 'UTF-8'], ['groups' => 'users-list']);
+        return $this->json($response, 201, ['charset' => 'UTF-8'], ['groups' => 'user-details']);
     }
 
     /**
