@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Company;
 use App\Entity\User;
+use App\Form\UserType;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class UserController extends AbstractController
 {
@@ -48,11 +52,51 @@ class UserController extends AbstractController
     /**
      *@Route("/api/users", name="api_add_user", methods={"POST"})
      */
-    public function addUser()
+    public function addUser(Request $request, SerializerInterface $serializer, ValidatorInterface $validator)
     {
-        $message = 'New user added';
+        $manager = $this->getDoctrine()->getManager();
+
+        if ($request->query->get('companyId') !== null) {
+            $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
+        } else {
+            throw new Exception('Missing company Id, 404');
+        }
+
+        //Gets the user data from the request body
+        $userData = json_decode($request->getContent(), true);
+
+        //Uses the form component to hydrate the user
+        $user = new User;
+        $userForm = $this->createForm(UserType::class, $user);
+        $userForm->submit($userData);
+
+        //Gets the validation errors and calls the error handler
+        if (!$userForm->isValid()) {
+            $errorMessages = [];
+
+            $errors = $userForm->getErrors(true);
+
+            for ($i = 0; $i < count($errors); $i++) {
+                $errorMessages[$i]['fieldName'] = $errors[$i]->getOrigin()->getName();
+                $errorMessages[$i]['message'] = $errors[$i]->getMessage();
+            }
+
+            throw new Exception(json_encode($errorMessages));
+        };
+
+        //Sets the company
+        $user->setCompany($company);
+
+        $manager->persist($user);
+
+        $manager->flush();
         
-        return $this->json($message, 201, [], ['groups' => 'users-list']);
+        $response = [
+            'message' => 'New user added',
+            'user' => $user
+        ];
+        
+        return $this->json($response, 201, ['charset' => 'UTF-8'], ['groups' => 'users-list']);
     }
 
     /**

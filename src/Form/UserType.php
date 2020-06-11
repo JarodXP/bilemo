@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Form;
 
-use App\Entity\Company;
 use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Company;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 class UserType extends AbstractType
 {
@@ -54,12 +55,9 @@ class UserType extends AbstractType
                 'constraints' => [
                     new Regex([
                         'pattern' => '~^\+[0-9]{1,4}[\(0-9{1,10}\)]?[0-9]{4,30}$~',
-                        'message' => '{value} is not a valid phone number.'
+                        'message' => 'This is not a valid phone number.'
                     ])
                 ]
-            ])
-            ->add('company', EntityType::class, [
-                'class' => Company::class
             ])
         ;
     }
@@ -68,6 +66,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'csrf_protection' => false,
         ]);
     }
 }

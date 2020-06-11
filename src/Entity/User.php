@@ -33,24 +33,24 @@ class User
      * @ORM\Column(type="string", length=255)
      * @Groups({"user-details"})
      */
-    private string $email;
+    private ?string $email = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"users-list", "user-details"})
      */
-    private string $firstName;
+    private ?string $firstName = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"users-list", "user-details"})
      */
-    private string $lastName;
+    private ?string $lastName = null;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private string $phoneNumber;
+    private ?string $phoneNumber = null;
 
     /**
      * @ORM\Column(type="datetime")
@@ -61,10 +61,9 @@ class User
     /**
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotNull
      * @Groups({"user-details"})
      */
-    private Company $company;
+    private ?Company $company = null;
 
     public function __construct()
     {
