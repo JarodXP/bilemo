@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Removes all files and subfolders ##
-rm -rf /var/www/bilemo-test/*
+rm -rf /var/www/deployDirectory/*
 
 ## Find all hidden files and delete it ##
-find /var/www/bilemo-test/ -maxdepth 1 -type f -name ".*" -delete
+find /var/www/deployDirectory/ -maxdepth 1 -type f -name ".*" -delete
