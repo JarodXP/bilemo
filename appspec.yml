@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/bilemo-test
+    destination: /var/www/deployDirectory
 hooks:
   BeforeInstall:
     - location: scripts/clear-project.sh
