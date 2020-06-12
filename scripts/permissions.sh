@@ -1,13 +1,6 @@
 #!/bin/bash
 
-#Sets ownership
-sudo find /var/www/bilemo-test/public -type d -exec chown www-data {} +
-sudo find /var/www/bilemo-test/public -type f -exec chown www-data {} +
+HTTPDUSER=$(ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1)
 
-#Sets permissions
-sudo find /var/www/bilemo-test/ -type d -exec chmod 755 {} +
-sudo find /var/www/bilemo-test/ -type f -exec chmod 644 {} +
-
-#Set var/log/ & var/cache permission
-chmod -R 777 /var/www/bilemo-test/var/log/
-chmod -R 777 /var/www/bilemo-test/var/cache/
+ sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
+ sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
