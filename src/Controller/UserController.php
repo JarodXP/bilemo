@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Entity\User;
+use App\Exception\RequestStructureException;
+use App\Exception\WrongParameterException;
 use App\Form\UserType;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +72,7 @@ class UserController extends AbstractController
         if ($request->query->get('companyId') !== null) {
             $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
         } else {
-            throw new Exception('Missing company Id, 404');
+            throw new WrongParameterException('Missing company Id');
         }
 
         //Gets the user data from the request body
@@ -92,7 +94,7 @@ class UserController extends AbstractController
                 $errorMessages[$i]['message'] = $errors[$i]->getMessage();
             }
 
-            throw new Exception(json_encode($errorMessages));
+            throw new RequestStructureException(json_encode($errorMessages));
         }
 
         //Sets the company
