@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
  */
@@ -26,6 +27,13 @@ class Company implements UserInterface
      * @ORM\Column(type="integer")
      */
     private int $id;
+
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email."
+     * )     */
+    private string $email;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -40,22 +48,15 @@ class Company implements UserInterface
     private string $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\Length(
-     *     min = 8,
-     *     max = 20,
-     *     minMessage = "The password length must be up to 8 characters",
-     *     maxMessage = "The company name length must be less than 20 characters")
+     * @ORM\Column(type="json")
      */
-    private string $password;
+    private array $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\Email(
-     *     message = "The email '{{ value }}' is not a valid email."
-     * )
+     * @var string The hashed password
+     * @ORM\Column(type="string")
      */
-    private string $email;
+    private string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -138,12 +139,6 @@ class Company implements UserInterface
      */
     private Collection $users;
 
-    /**
-     * @ORM\Column(type="simple_array", nullable=true)
-     * @var array
-     */
-    private array $roles = [];
-
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -152,6 +147,18 @@ class Company implements UserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -166,9 +173,41 @@ class Company implements UserInterface
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
     {
-        return $this->password;
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return (string) $this->password;
     }
 
     public function setPassword(string $password): self
@@ -178,16 +217,12 @@ class Company implements UserInterface
         return $this;
     }
 
-    public function getEmail(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
     {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
     public function getPhoneNumber(): ?string
@@ -305,35 +340,13 @@ class Company implements UserInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getRoles()
-    {
-        $roles = $this->roles;
-
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_COMPANY';
-    }
 
     /**
-     * @inheritDoc
-     */
-    public function getSalt()
-    {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getUsername()
-    {
-    }
-
-    /**
-     * @inheritDoc
+     * @see UserInterface
      */
     public function eraseCredentials()
     {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 }
