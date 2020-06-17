@@ -61,7 +61,7 @@ class AppFixtures extends Fixture
             $company
                 ->setName($faker->company)
                 ->setPassword($this->_passwordEncoder->encodePassword($company, 'azerty'))
-                ->setEmail(strtolower(str_replace(' ', '-', $companyName)))
+                ->setEmail('contact@'.strtolower(str_replace(' ', '-', $companyName)).'.com')
                 ->setStreetNumber($faker->buildingNumber)
                 ->setStreetName($faker->streetName)
                 ->setCity($faker->city)
