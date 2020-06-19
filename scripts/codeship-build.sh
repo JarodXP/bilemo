@@ -11,7 +11,7 @@ else
 fi
 
 #Sets the env vars in the .env.local from the CodeShip env vars
-printf "%s\n" "APP_ENV=$environment" "DATABASE_URL=$DATABASE_URL" > .env.local
+printf "%s\n" "APP_ENV=$environment" "DATABASE_URL=$DATABASE_URL" "JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem" "JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem" > .env.local
 
 #Sets the deploy directory for scripts
 sudo find appspec.yml -type f -exec sed -i "s/deployDirectory/$deployDirectory/" {} \;
