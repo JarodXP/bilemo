@@ -8,9 +8,11 @@ use DateTime;
 use App\Entity\Company;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -18,6 +20,44 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @Serializer\XmlRoot("user")
+ * @Hateoas\Relation(
+ *          name="self",
+ *          href=@Hateoas\Route(
+ *             "api_user_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"user-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Get user",
+ *          href=@Hateoas\Route("api_user_details"),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"users-list"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Add user",
+ *          href=@Hateoas\Route("api_add_user"),
+ *          attributes={"method"="POST"},
+ *          exclusion=@Hateoas\Exclusion(groups={"users-list", "user-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Remove user",
+ *          href=@Hateoas\Route("api_remove_user",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="DELETE"},
+ *          exclusion=@Hateoas\Exclusion(groups={"users-list", "user-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Users list",
+ *          href=@Hateoas\Route("api_users_list"),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"user-details"})
+ * )
  */
 class User
 {
@@ -25,6 +65,7 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Serializer\XmlAttribute
      * @Groups({"users-list", "user-details"})
      */
     private int $id;

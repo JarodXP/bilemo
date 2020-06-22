@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Company;
-use App\Entity\User;
-use App\Exception\RequestStructureException;
-use App\Exception\WrongParameterException;
-use App\Form\UserType;
 use Exception;
+use App\Entity\User;
+use App\Form\UserType;
+use App\Entity\Company;
+use Hateoas\HateoasBuilder;
+use JMS\Serializer\SerializationContext;
+use App\Exception\WrongParameterException;
+use App\Exception\RequestStructureException;
+use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UserController extends AbstractController
 {
@@ -47,14 +52,15 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      */
-    public function userDetails(User $user)
+    public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
-        $response = [
-            'hypermedia' => 'There will be some links',
-            'user details' => $user
-        ];
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
 
-        return $this->json($response, 200, [], ['groups' => 'user-details']);
+        $json = $hateoas->serialize($user, 'json', SerializationContext::create()->setGroups(['groups' => 'user-details']));
+
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
  
     /**

@@ -7,14 +7,13 @@ namespace App\Entity;
 use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CompanyRepository;
+use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
-
 
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
@@ -25,6 +24,7 @@ class Company implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user-details"})
      */
     private int $id;
 
@@ -43,7 +43,7 @@ class Company implements UserInterface
      *     max = 50,
      *     minMessage = "The company name length must be up to 1 character",
      *     maxMessage = "The company name length must be less than 50 characters")
-     * @Groups({"users-list"})
+     * @Groups({"user-details"})
      */
     private string $name;
 
