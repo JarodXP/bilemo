@@ -19,7 +19,8 @@
         "symfony/security-bundle": "5.1.*",
         "symfony/serializer-pack": "^1.0",
         "symfony/validator": "5.1.*",
-        "symfony/yaml": "5.1.*"
+        "symfony/yaml": "5.1.*",
+        "willdurand/hateoas-bundle": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9",
@@ -72,7 +73,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "5.1.*"
         }
     }
