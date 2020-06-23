@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          name="Phones list",
  *          href=@Hateoas\Route("api_phones_list"),
  *          attributes={"method"="GET"},
- *          exclusion=@Hateoas\Exclusion(groups={"phone-list"})
+ *          exclusion=@Hateoas\Exclusion(groups={"phone-list", "phone-details"})
  * )
  */
 class Phone

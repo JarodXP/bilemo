@@ -9,13 +9,12 @@ use Hateoas\HateoasBuilder;
 use JMS\Serializer\SerializationContext;
 use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Hateoas\Representation\PaginatedRepresentation;
 use Hateoas\Representation\CollectionRepresentation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\Response;
 
 class PhoneController extends AbstractController
 {
@@ -62,13 +61,14 @@ class PhoneController extends AbstractController
     /**
      *@Route("/api/phones/{id}", name="api_phone_details", methods={"GET"})
      */
-    public function phoneDetails(Phone $phone)
+    public function phoneDetails(Phone $phone, UrlGeneratorInterface $urlGeneratorInterface)
     {
-        $response = [
-            'hypermedia' => 'There will be some links',
-            'phone details' => $phone
-        ];
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
 
-        return $this->json($response, 200, [], ['phone-details']);
+        $json = $hateoas->serialize($phone, 'json', SerializationContext::create()->setGroups(['groups' => 'phone-details']));
+
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
 }
