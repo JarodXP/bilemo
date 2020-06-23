@@ -151,7 +151,7 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      */
-    public function removeUser(Request $request, User $user)
+    public function removeUser(Request $request, User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $manager = $this->getDoctrine()->getManager();
 
@@ -172,10 +172,25 @@ class UserController extends AbstractController
         $manager->flush();
 
         $response = [
-            'hypermedia' => 'There will be some links',
             'message' => 'User '.$userId.' removed',
+            '_links' => [
+                'Add user' => [
+                    'href' => $this->generateUrl('api_add_user'),
+                    'method' => 'POST'
+                ],
+                'Get list' => [
+                    'href' => $this->generateUrl('api_users_list'),
+                    'method' => 'GET'
+                ]
+            ]
         ];
-        
-        return $this->json($response, 200, [], ['groups' => 'users-list']);
+
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
+
+        $json = $hateoas->serialize($response, 'json');
+
+        return new Response($json, 201, ['Content-Type' => 'application/hal+json']);
     }
 }
