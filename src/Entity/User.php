@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @Serializer\XmlRoot("user")
+ * @Serializer\ExclusionPolicy("all")
  * @Hateoas\Relation(
  *          name="self",
  *          href=@Hateoas\Route(
@@ -33,15 +34,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  * @Hateoas\Relation(
  *          name="Get user",
- *          href=@Hateoas\Route("api_user_details"),
+ *          href=@Hateoas\Route(
+ *             "api_user_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
  *          attributes={"method"="GET"},
  *          exclusion=@Hateoas\Exclusion(groups={"users-list"})
- * )
- * @Hateoas\Relation(
- *          name="Add user",
- *          href=@Hateoas\Route("api_add_user"),
- *          attributes={"method"="POST"},
- *          exclusion=@Hateoas\Exclusion(groups={"users-list", "user-details"})
  * )
  * @Hateoas\Relation(
  *          name="Remove user",
@@ -66,6 +65,7 @@ class User
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Serializer\XmlAttribute
+     * @Serializer\Expose()
      * @Groups({"users-list", "user-details"})
      */
     private int $id;
@@ -78,6 +78,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Expose()
      * @Groups({"users-list", "user-details"})
      */
     private ?string $firstName = null;

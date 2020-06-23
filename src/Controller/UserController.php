@@ -15,11 +15,13 @@ use App\Exception\RequestStructureException;
 use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Annotation\Route as Route;
+use Hateoas\Representation\PaginatedRepresentation;
+use Hateoas\Representation\CollectionRepresentation;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
 {
@@ -29,21 +31,41 @@ class UserController extends AbstractController
      * @param  mixed $request
      * @return void
      */
-    public function usersList(Request $request)
+    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $page = (int) $request->query->get('page');
         $limit = (int) $request->query->get('limit');
 
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
-        $response = [
-            'hypermedia' => 'There will be some links',
-            'page' => $page,
-            'limit' => $limit,
-            'phones' => $repo->findUserList($page, $limit)
-        ];
+        $paginatorList = $repo->findUserList($page, $limit);
 
-        return $this->json($response, 200, [], ['groups' => 'users-list']);
+        foreach ($paginatorList as $user) {
+            $users[] = $user;
+        };
+
+        $paginatedCollection = new PaginatedRepresentation(
+            new CollectionRepresentation(
+                $users
+            ),
+            'api_users_list',
+            [],
+            ($paginatorList->getQuery()->getFirstResult()/$paginatorList->getQuery()->getMaxResults())+1,
+            $paginatorList->getQuery()->getMaxResults(),
+            (int) ceil(count($paginatorList)/$paginatorList->getQuery()->getMaxResults()),
+            null,
+            null,
+            false,
+            count($paginatorList)
+        );
+
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
+
+        $json = $hateoas->serialize($paginatedCollection, 'json', SerializationContext::create()->setGroups(['Default', 'users-list']));
+
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
    
     /**
