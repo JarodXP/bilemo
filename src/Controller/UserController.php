@@ -12,12 +12,11 @@ use Hateoas\HateoasBuilder;
 use JMS\Serializer\SerializationContext;
 use App\Exception\WrongParameterException;
 use App\Exception\RequestStructureException;
+use App\Service\HateoasItemLister;
 use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route as Route;
-use Hateoas\Representation\PaginatedRepresentation;
-use Hateoas\Representation\CollectionRepresentation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -29,44 +28,12 @@ class UserController extends AbstractController
      * @param  mixed $request
      * @return void
      */
-    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
+    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
     {
-        //Sets the query parameters
-        $page = (int) $request->query->get('page');
-        $limit = (int) $request->query->get('limit');
-
+        //Sets the repository
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
-        //Gets the list of phones
-        $paginatorList = $repo->findUserList($page, $limit);
-
-        //Converts the Paginator object into an array of users to be transmitted to the PaginatedRepresentation
-        foreach ($paginatorList as $user) {
-            $users[] = $user;
-        };
-
-        //Use the PaginatedRepresentation to build the collection and the hypertext params
-        $paginatedCollection = new PaginatedRepresentation(
-            new CollectionRepresentation(
-                $users
-            ),
-            'api_users_list',
-            [],
-            ($paginatorList->getQuery()->getFirstResult()/$paginatorList->getQuery()->getMaxResults())+1,
-            $paginatorList->getQuery()->getMaxResults(),
-            (int) ceil(count($paginatorList)/$paginatorList->getQuery()->getMaxResults()),
-            null,
-            null,
-            false,
-            count($paginatorList)
-        );
-
-        //Use Hateoas builder to serialize
-        $hateoas = HateoasBuilder::create()
-                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
-                ->build();
-
-        $json = $hateoas->serialize($paginatedCollection, 'json', SerializationContext::create()->setGroups(['Default', 'users-list']));
+        $json = $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'users-list']);
 
         return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
