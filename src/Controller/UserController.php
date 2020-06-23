@@ -31,17 +31,21 @@ class UserController extends AbstractController
      */
     public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
+        //Sets the query parameters
         $page = (int) $request->query->get('page');
         $limit = (int) $request->query->get('limit');
 
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
+        //Gets the list of phones
         $paginatorList = $repo->findUserList($page, $limit);
 
+        //Converts the Paginator object into an array of users to be transmitted to the PaginatedRepresentation
         foreach ($paginatorList as $user) {
             $users[] = $user;
         };
 
+        //Use the PaginatedRepresentation to build the collection and the hypertext params
         $paginatedCollection = new PaginatedRepresentation(
             new CollectionRepresentation(
                 $users
@@ -57,6 +61,7 @@ class UserController extends AbstractController
             count($paginatorList)
         );
 
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();
@@ -74,6 +79,7 @@ class UserController extends AbstractController
      */
     public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();
@@ -93,6 +99,7 @@ class UserController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
 
+        //Checks if company Id is set and sets the company
         if ($request->query->get('companyId') !== null) {
             $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
         } else {
@@ -128,11 +135,13 @@ class UserController extends AbstractController
 
         $manager->flush();
         
+        //Builds the response to be serialized
         $response = [
             'message' => 'New user added',
             'user' => $user
         ];
 
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();
@@ -169,6 +178,7 @@ class UserController extends AbstractController
 
         $manager->flush();
 
+        //Builds the response to be serialized
         $response = [
             'message' => 'User '.$userId.' removed',
             '_links' => [
@@ -183,6 +193,7 @@ class UserController extends AbstractController
             ]
         ];
 
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();

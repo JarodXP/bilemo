@@ -23,17 +23,21 @@ class PhoneController extends AbstractController
      */
     public function phonesList(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
+        //Sets the query parameters
         $page = (int) $request->query->get('page');
         $limit = (int) $request->query->get('limit');
 
         $repo = $this->getDoctrine()->getManager()->getRepository(Phone::class);
 
+        //Gets the list of phones
         $paginatorList = $repo->findPhoneList($page, $limit);
 
+        //Converts the Paginator object into an array of phones to be transmitted to the PaginatedRepresentation
         foreach ($paginatorList as $phone) {
             $phones[] = $phone;
         };
 
+        //Use the PaginatedRepresentation to build the collection and the hypertext params
         $paginatedCollection = new PaginatedRepresentation(
             new CollectionRepresentation(
                 $phones
@@ -49,6 +53,7 @@ class PhoneController extends AbstractController
             count($paginatorList)
         );
 
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();
@@ -63,6 +68,7 @@ class PhoneController extends AbstractController
      */
     public function phoneDetails(Phone $phone, UrlGeneratorInterface $urlGeneratorInterface)
     {
+        //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
                 ->build();
