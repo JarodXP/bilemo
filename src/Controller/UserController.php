@@ -89,11 +89,9 @@ class UserController extends AbstractController
      * addUser
      * @Route("/api/users", name="api_add_user", methods={"POST"})
      * @param  mixed $request
-     * @param  mixed $serializer
-     * @param  mixed $validator
      * @return void
      */
-    public function addUser(Request $request, SerializerInterface $serializer, ValidatorInterface $validator)
+    public function addUser(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $manager = $this->getDoctrine()->getManager();
 
@@ -133,12 +131,17 @@ class UserController extends AbstractController
         $manager->flush();
         
         $response = [
-            'hypermedia' => 'There will be some links',
             'message' => 'New user added',
             'user' => $user
         ];
-        
-        return $this->json($response, 201, ['charset' => 'UTF-8'], ['groups' => 'user-details']);
+
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
+
+        $json = $hateoas->serialize($response, 'json', SerializationContext::create()->setGroups(['user-details']));
+
+        return new Response($json, 201, ['Content-Type' => 'application/hal+json']);
     }
 
     /**

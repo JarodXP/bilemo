@@ -66,44 +66,51 @@ class User
      * @ORM\Column(type="integer")
      * @Serializer\XmlAttribute
      * @Serializer\Expose()
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?string $email = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose()
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private ?string $firstName = null;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private ?string $lastName = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?string $phoneNumber = null;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"user-details"})
+     * @Serializer\Type("DateTime<'Y-m-d'>")
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private DateTime $dateAdded;
 
     /**
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?Company $company = null;
 
