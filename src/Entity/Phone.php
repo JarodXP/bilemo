@@ -6,13 +6,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PhoneRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
+ * @Serializer\XmlRoot("phone")
+ * @Serializer\ExclusionPolicy("all")
+ * @Hateoas\Relation(
+ *          name="self",
+ *          href=@Hateoas\Route(
+ *             "api_phone_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"phone-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Get phone",
+ *          href=@Hateoas\Route(
+ *             "api_phone_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"phone-list"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Phones list",
+ *          href=@Hateoas\Route("api_phones_list"),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"phone-list", "phone-details"})
+ * )
  */
 class Phone
 {
@@ -20,6 +50,7 @@ class Phone
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
      */
     private int $id;
@@ -32,6 +63,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The phone name length must be up to 2 characters",
      *     maxMessage = "The phone name length must be less than 50 characters")
+     * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
      */
     private string $name;
@@ -44,6 +76,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The supplier name length must be up to 3 characters",
      *     maxMessage = "The supplier name length must be less than 50 characters")
+     * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
      */
     private string $supplier;
@@ -56,6 +89,7 @@ class Phone
      *     max = 50,
      *     minMessage = "The reference length must be up to 2 characters",
      *     maxMessage = "The reference name length must be less than 50 characters")
+     * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
      */
     private string $productReference;
@@ -68,12 +102,14 @@ class Phone
      *     max = 50,
      *     minMessage = "The color length must be up to 2 characters",
      *     maxMessage = "The color length must be less than 50 characters")
+     * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
      */
     private string $color;
 
     /**
      * @ORM\Column(type="array")
+     * @Serializer\Expose()
      * @Groups({"phone-details"})
      */
     private array $features = [];

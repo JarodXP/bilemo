@@ -8,9 +8,11 @@ use DateTime;
 use App\Entity\Company;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -18,6 +20,43 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @Serializer\XmlRoot("user")
+ * @Serializer\ExclusionPolicy("all")
+ * @Hateoas\Relation(
+ *          name="self",
+ *          href=@Hateoas\Route(
+ *             "api_user_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"user-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Get user",
+ *          href=@Hateoas\Route(
+ *             "api_user_details",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"users-list"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Remove user",
+ *          href=@Hateoas\Route("api_remove_user",
+ *             parameters = {
+ *             "id" = "expr(object.getId())"
+ *             }),
+ *          attributes={"method"="DELETE"},
+ *          exclusion=@Hateoas\Exclusion(groups={"users-list", "user-details"})
+ * )
+ * @Hateoas\Relation(
+ *          name="Users list",
+ *          href=@Hateoas\Route("api_users_list"),
+ *          attributes={"method"="GET"},
+ *          exclusion=@Hateoas\Exclusion(groups={"user-details"})
+ * )
  */
 class User
 {
@@ -25,43 +64,53 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\XmlAttribute
+     * @Serializer\Expose()
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?string $email = null;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\Expose()
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private ?string $firstName = null;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"users-list", "user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"users-list", "user-details"})
      */
     private ?string $lastName = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?string $phoneNumber = null;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"user-details"})
+     * @Serializer\Type("DateTime<'Y-m-d'>")
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private DateTime $dateAdded;
 
     /**
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user-details"})
+     * @Serializer\Expose
+     * @Serializer\Groups({"user-details"})
      */
     private ?Company $company = null;
 

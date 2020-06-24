@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Company;
-use App\Entity\User;
-use App\Exception\RequestStructureException;
-use App\Exception\WrongParameterException;
-use App\Form\UserType;
 use Exception;
+use App\Entity\User;
+use App\Form\UserType;
+use App\Entity\Company;
+use Hateoas\HateoasBuilder;
+use JMS\Serializer\SerializationContext;
+use App\Exception\WrongParameterException;
+use App\Exception\RequestStructureException;
+use App\Service\HateoasItemLister;
+use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route as Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
@@ -24,21 +28,14 @@ class UserController extends AbstractController
      * @param  mixed $request
      * @return void
      */
-    public function usersList(Request $request)
+    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
     {
-        $page = (int) $request->query->get('page');
-        $limit = (int) $request->query->get('limit');
-
+        //Sets the repository
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
-        $response = [
-            'hypermedia' => 'There will be some links',
-            'page' => $page,
-            'limit' => $limit,
-            'phones' => $repo->findUserList($page, $limit)
-        ];
+        $json = $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'users-list']);
 
-        return $this->json($response, 200, [], ['groups' => 'users-list']);
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
    
     /**
@@ -47,28 +44,29 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      */
-    public function userDetails(User $user)
+    public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
-        $response = [
-            'hypermedia' => 'There will be some links',
-            'user details' => $user
-        ];
+        //Use Hateoas builder to serialize
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
 
-        return $this->json($response, 200, [], ['groups' => 'user-details']);
+        $json = $hateoas->serialize($user, 'json', SerializationContext::create()->setGroups(['groups' => 'user-details']));
+
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
  
     /**
      * addUser
      * @Route("/api/users", name="api_add_user", methods={"POST"})
      * @param  mixed $request
-     * @param  mixed $serializer
-     * @param  mixed $validator
      * @return void
      */
-    public function addUser(Request $request, SerializerInterface $serializer, ValidatorInterface $validator)
+    public function addUser(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $manager = $this->getDoctrine()->getManager();
 
+        //Checks if company Id is set and sets the company
         if ($request->query->get('companyId') !== null) {
             $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
         } else {
@@ -104,13 +102,20 @@ class UserController extends AbstractController
 
         $manager->flush();
         
+        //Builds the response to be serialized
         $response = [
-            'hypermedia' => 'There will be some links',
             'message' => 'New user added',
             'user' => $user
         ];
-        
-        return $this->json($response, 201, ['charset' => 'UTF-8'], ['groups' => 'user-details']);
+
+        //Use Hateoas builder to serialize
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
+
+        $json = $hateoas->serialize($response, 'json', SerializationContext::create()->setGroups(['user-details']));
+
+        return new Response($json, 201, ['Content-Type' => 'application/hal+json']);
     }
 
     /**
@@ -120,7 +125,7 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      */
-    public function removeUser(Request $request, User $user)
+    public function removeUser(Request $request, User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $manager = $this->getDoctrine()->getManager();
 
@@ -140,11 +145,28 @@ class UserController extends AbstractController
 
         $manager->flush();
 
+        //Builds the response to be serialized
         $response = [
-            'hypermedia' => 'There will be some links',
             'message' => 'User '.$userId.' removed',
+            '_links' => [
+                'Add user' => [
+                    'href' => $this->generateUrl('api_add_user'),
+                    'method' => 'POST'
+                ],
+                'Get list' => [
+                    'href' => $this->generateUrl('api_users_list'),
+                    'method' => 'GET'
+                ]
+            ]
         ];
-        
-        return $this->json($response, 200, [], ['groups' => 'users-list']);
+
+        //Use Hateoas builder to serialize
+        $hateoas = HateoasBuilder::create()
+                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                ->build();
+
+        $json = $hateoas->serialize($response, 'json');
+
+        return new Response($json, 201, ['Content-Type' => 'application/hal+json']);
     }
 }

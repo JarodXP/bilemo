@@ -32,7 +32,7 @@ class PhoneRepository extends ServiceEntityRepository
      * @param mixed $limit
      * @return Paginator
      */
-    public function findPhoneList(int $page = null, int $limit = null):Paginator
+    public function findList(int $page = null, int $limit = null):Paginator
     {
         return $this->findPaginatedList('p', 'name', $page, $limit);
     }
