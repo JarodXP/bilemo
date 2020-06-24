@@ -68,13 +68,6 @@ class UserController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
 
-        //Checks if company Id is set and sets the company
-        if ($request->query->get('companyId') !== null) {
-            $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
-        } else {
-            throw new WrongParameterException('Missing company Id');
-        }
-
         //Gets the user data from the request body
         $userData = json_decode($request->getContent(), true);
 
@@ -98,7 +91,7 @@ class UserController extends AbstractController
         }
 
         //Sets the company
-        $user->setCompany($company);
+        $user->setCompany($this->getUser());
 
         $manager->persist($user);
 
