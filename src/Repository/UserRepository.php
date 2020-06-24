@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\User;
 use App\Service\Lister;
 use Doctrine\Persistence\ManagerRegistry;
@@ -32,8 +33,8 @@ class UserRepository extends ServiceEntityRepository
      * @param mixed $limit
      * @return Paginator
      */
-    public function findList(int $page = null, int $limit = null):Paginator
+    public function findList(int $page = null, int $limit = null, Company $company):Paginator
     {
-        return $this->findPaginatedList('u', 'lastName', $page, $limit);
+        return $this->findPaginatedList('u', 'lastName', $page, $limit, $company);
     }
 }
