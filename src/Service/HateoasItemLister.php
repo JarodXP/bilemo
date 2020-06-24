@@ -96,15 +96,11 @@ class HateoasItemLister
         $limit = (int) $request->query->get('limit');
 
         //Gets a Paginator object with the list of items
-        switch (get_class($repo)) {
-            case 'App\Repository\UserRepository':
-                $company = $this->_tokenBag->getToken()->getUser();
-                $paginatorList = $repo->findList($page, $limit, $company);
-
-            break;
-            default:
-                $paginatorList = $repo->findList($page, $limit);
-            break;
+        if (get_class($repo) == 'App\Repository\UserRepository') {
+            $company = $this->_tokenBag->getToken()->getUser();
+            $paginatorList = $repo->findList($company, $page, $limit);
+        } else {
+            $paginatorList = $repo->findList($page, $limit);
         }
 
         //Converts the Paginator object into an array of users to be transmitted to the PaginatedRepresentation

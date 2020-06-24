@@ -33,7 +33,7 @@ class UserRepository extends ServiceEntityRepository
      * @param mixed $limit
      * @return Paginator
      */
-    public function findList(int $page = null, int $limit = null, Company $company):Paginator
+    public function findList(Company $company, int $page = null, int $limit = null):Paginator
     {
         return $this->findPaginatedList('u', 'lastName', $page, $limit, $company);
     }

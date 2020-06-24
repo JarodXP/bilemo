@@ -32,8 +32,6 @@ class UserController extends AbstractController
      */
     public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
     {
-        $company = $this->getUser();
-        
         //Sets the repository
         $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
 
