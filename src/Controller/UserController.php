@@ -8,10 +8,12 @@ use Exception;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Entity\Company;
+use App\Exception\NotOwnerException;
 use Hateoas\HateoasBuilder;
 use JMS\Serializer\SerializationContext;
 use App\Exception\WrongParameterException;
 use App\Exception\RequestStructureException;
+use App\Security\UserVoter;
 use App\Service\HateoasItemLister;
 use Hateoas\UrlGenerator\SymfonyUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,6 +48,10 @@ class UserController extends AbstractController
      */
     public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
+        if (!$this->isGranted(UserVoter::EDIT, $user)) {
+            throw new NotOwnerException("You are not allowed to view this user's details");
+        }
+
         //Use Hateoas builder to serialize
         $hateoas = HateoasBuilder::create()
                 ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
@@ -65,13 +71,6 @@ class UserController extends AbstractController
     public function addUser(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
         $manager = $this->getDoctrine()->getManager();
-
-        //Checks if company Id is set and sets the company
-        if ($request->query->get('companyId') !== null) {
-            $company = $manager->getRepository(Company::class)->findOneBy(['id' => $request->query->get('companyId')]);
-        } else {
-            throw new WrongParameterException('Missing company Id');
-        }
 
         //Gets the user data from the request body
         $userData = json_decode($request->getContent(), true);
@@ -96,7 +95,7 @@ class UserController extends AbstractController
         }
 
         //Sets the company
-        $user->setCompany($company);
+        $user->setCompany($this->getUser());
 
         $manager->persist($user);
 
@@ -127,16 +126,12 @@ class UserController extends AbstractController
      */
     public function removeUser(Request $request, User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
-        $manager = $this->getDoctrine()->getManager();
-
         //Compares the company of the requester with the company the user belongs to.
-        $companyId = $request->query->get('companyId');
-
-        if ($companyId != $user->getCompany()->getId()) {
-
-            //If the user doesn't belong to the company, throws exception
-            throw new Exception('You are not allowed to remove a user that doesn\'t belog to your company');
+        if (!$this->isGranted(UserVoter::EDIT, $user)) {
+            throw new NotOwnerException('You are not allowed to delete this user');
         }
+
+        $manager = $this->getDoctrine()->getManager();
 
         //Stores the user id to be implemented in the message
         $userId = $user->getId();

@@ -12,16 +12,19 @@ use Hateoas\Representation\PaginatedRepresentation;
 use Hateoas\Representation\CollectionRepresentation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HateoasItemLister
 {
     private array $_listParams = [];
     private array $_embeddedItems = [];
     private UrlGeneratorInterface $_urlGeneratorInterface;
+    private TokenStorageInterface $_tokenBag;
 
-    public function __construct(UrlGeneratorInterface $urlGeneratorInterface)
+    public function __construct(UrlGeneratorInterface $urlGeneratorInterface, TokenStorageInterface $tokenBag)
     {
         $this->_urlGeneratorInterface = $urlGeneratorInterface;
+        $this->_tokenBag = $tokenBag;
     }
     
     /**
@@ -93,7 +96,12 @@ class HateoasItemLister
         $limit = (int) $request->query->get('limit');
 
         //Gets a Paginator object with the list of items
-        $paginatorList = $repo->findList($page, $limit);
+        if (get_class($repo) == 'App\Repository\UserRepository') {
+            $company = $this->_tokenBag->getToken()->getUser();
+            $paginatorList = $repo->findList($company, $page, $limit);
+        } else {
+            $paginatorList = $repo->findList($page, $limit);
+        }
 
         //Converts the Paginator object into an array of users to be transmitted to the PaginatedRepresentation
         foreach ($paginatorList as $item) {

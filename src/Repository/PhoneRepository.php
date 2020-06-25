@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\Phone;
 use App\Service\Lister;
 use Doctrine\Persistence\ManagerRegistry;
