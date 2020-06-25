@@ -1,0 +1,32 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Bilemo API
+            description: Feed your catalogue with our phones!
+            version: 1.0.0
+            contact: 
+                name: Bilemo Support
+        securityDefinitions:
+            Bearer:
+                type: apiKey
+                description: 'Authorization: Bearer {jwt}'
+                name: Authorization
+                in: header
+                scheme: Bearer
+        security:
+            - Bearer: []
+
+    areas: # to filter documented areas
+        default:
+            path_patterns:
+                - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+
+    models:
+        names:
+            - { alias: UserDetails, type: App\Entity\User, groups: [user-details] }
+            - { alias: UserList, type: Hateoas\Representation\PaginatedRepresentation, groups: [Default, users-list]}
+            - { alias: PhoneDetails, type: App\Entity\Phone, groups: [phone-details] }
+            - { alias: PhoneList, type: Hateoas\Representation\PaginatedRepresentation, groups: [Default, phone-list]}
+            - { alias: Company, type: App\Entity\Company, groups: [user-details] }
+            - { alias: AddUserForm, type: App\Form\UserType}
+

@@ -91,6 +91,7 @@ class Phone
      *     maxMessage = "The reference name length must be less than 50 characters")
      * @Serializer\Expose()
      * @Groups({"phone-list", "phone-details"})
+     * @Serializer\SerializedName("productReference")
      */
     private string $productReference;
 
@@ -110,6 +111,7 @@ class Phone
     /**
      * @ORM\Column(type="array")
      * @Serializer\Expose()
+     * @Serializer\Type("array<string, string>")
      * @Groups({"phone-details"})
      */
     private array $features = [];

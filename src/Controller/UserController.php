@@ -21,14 +21,41 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route as Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Swagger\Annotations as SWG;
+use Hateoas\Representation\PaginatedRepresentation;
 
 class UserController extends AbstractController
 {
     /**
-     * usersList
      * @Route("/api/users", name="api_users_list", methods={"GET"})
      * @param  mixed $request
      * @return void
+     *
+     * @SWG\Response(
+     *      response=200,
+     *      description="Returns the list of users owned by the current company",
+     *      @SWG\Schema(
+     *          @Model(type=PaginatedRepresentation::class, groups={"Default","users-list"})
+     *      )
+     * )
+     * @SWG\Parameter(
+     *      name="page",
+     *      in="query",
+     *      description="Page number to return.",
+     *      type="integer",
+     *      default=1
+     * )
+     * @SWG\Parameter(
+     *      name="limit",
+     *      in="query",
+     *      description="Maximum number of items to return per page.",
+     *      type="integer",
+     *      default=5
+     * )
+     * @SWG\Tag(name="Users")
+     * @Security(name="Bearer")
      */
     public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
     {
@@ -41,10 +68,26 @@ class UserController extends AbstractController
     }
    
     /**
-     * userDetails
      * @Route("/api/users/{id}", name="api_user_details", methods={"GET"})
      * @param  mixed $user
      * @return void
+     *
+     * @SWG\Response(
+     *      response=200,
+     *      description="Returns a specific user detail.",
+     *      @SWG\Schema(
+     *          @Model(type=User::class, groups={"user-details"})
+     *      )
+     * )
+     * @SWG\Parameter(
+     *      name="id",
+     *      in="path",
+     *      description="Id of the user",
+     *      required=true,
+     *      type="integer",
+     * )
+     * @SWG\Tag(name="Users")
+     * @Security(name="Bearer")
      */
     public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
@@ -63,10 +106,27 @@ class UserController extends AbstractController
     }
  
     /**
-     * addUser
      * @Route("/api/users", name="api_add_user", methods={"POST"})
      * @param  mixed $request
      * @return void
+     *
+     * @SWG\Response(
+     *      response=201,
+     *      description="Adds a new user.",
+     *      @SWG\Schema(
+     *          @Model(type=User::class, groups={"user-details"})
+     *      )
+     * )
+     * @SWG\Parameter(
+     *      name="userForm",
+     *      in="body",
+     *      description="Details of the user",
+     *      required=true,
+     *      type="object",
+     *      @Model(type=UserType::class)
+     * )
+     * @SWG\Tag(name="Users")
+     * @Security(name="Bearer")
      */
     public function addUser(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
@@ -118,15 +178,31 @@ class UserController extends AbstractController
     }
 
     /**
-     * removeUser
      * @Route("/api/users/{id}", name="api_remove_user", methods={"DELETE"})
      * @param  mixed $request
      * @param  mixed $user
      * @return void
+     *
+     * @SWG\Response(
+     *      response=200,
+     *      description="Removes the specified user.",
+     *      @SWG\Schema(
+     *          @Model(type=User::class, groups={"user-details"})
+     *      )
+     * )
+     * @SWG\Parameter(
+     *      name="id",
+     *      in="path",
+     *      description="Id of the user",
+     *      required=true,
+     *      type="integer",
+     * )
+     * @SWG\Tag(name="Users")
+     * @Security(name="Bearer")
      */
     public function removeUser(Request $request, User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
-        //Compares the company of the requester with the company the user belongs to.
+        //Checks if company is allowed to remove the user.
         if (!$this->isGranted(UserVoter::EDIT, $user)) {
             throw new NotOwnerException('You are not allowed to delete this user');
         }
@@ -162,6 +238,6 @@ class UserController extends AbstractController
 
         $json = $hateoas->serialize($response, 'json');
 
-        return new Response($json, 201, ['Content-Type' => 'application/hal+json']);
+        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
     }
 }
