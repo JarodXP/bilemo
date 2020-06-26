@@ -27,6 +27,10 @@ class UserType extends AbstractType
                 'constraints' => [
                     new NotNull(),
                     new Email()
+                ],
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'User email'
                 ]
             ])
             ->add('firstName', TextType::class, [
@@ -38,6 +42,10 @@ class UserType extends AbstractType
                         'minMessage' => "The first name length must be up to 1 characters",
                         'maxMessage' => "The first name length must be less than 50 characters"
                     ])
+                ],
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'User first name'
                 ]
             ])
             ->add('lastName', TextType::class, [
@@ -49,6 +57,10 @@ class UserType extends AbstractType
                         'minMessage' => "The last name length must be up to 1 characters",
                         'maxMessage' => "The last name length must be less than 50 characters"
                     ])
+                ],
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'User last name'
                 ]
             ])
             ->add('phoneNumber', TelType::class, [
@@ -57,6 +69,10 @@ class UserType extends AbstractType
                         'pattern' => '~^\+[0-9]{1,4}[\(0-9{1,10}\)]?[0-9]{4,30}$~',
                         'message' => 'This is not a valid phone number.'
                     ])
+                ],
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'User phone number (not mandatory)'
                 ]
             ])
         ;

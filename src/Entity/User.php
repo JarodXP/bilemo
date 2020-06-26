@@ -73,28 +73,31 @@ class User
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
-     * @Serializer\Groups({"user-details"})
+     * @Serializer\Groups({"user-details", "documentation"})
      */
     private ?string $email = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose()
-     * @Serializer\Groups({"users-list", "user-details"})
+     * @Serializer\Groups({"users-list", "user-details", "documentation"})
+     * @Serializer\SerializedName("firstName")
      */
     private ?string $firstName = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
-     * @Serializer\Groups({"users-list", "user-details"})
+     * @Serializer\Groups({"users-list", "user-details", "documentation"})
+     * @Serializer\SerializedName("lastName")
      */
     private ?string $lastName = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Serializer\Expose
-     * @Serializer\Groups({"user-details"})
+     * @Serializer\Groups({"user-details", "documentation"})
+     * @Serializer\SerializedName("phoneNumber")
      */
     private ?string $phoneNumber = null;
 
@@ -103,6 +106,7 @@ class User
      * @Serializer\Type("DateTime<'Y-m-d'>")
      * @Serializer\Expose
      * @Serializer\Groups({"user-details"})
+     * @Serializer\SerializedName("dateAdded")
      */
     private DateTime $dateAdded;
 
