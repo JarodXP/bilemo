@@ -23,26 +23,30 @@ class PhoneController extends AbstractController
 {
     /**
      * @Route("/api/phones", name="api_phones_list", methods={"GET"})
-     * @SWG\Response(
-     *      response=200,
-     *      description="Returns the list of phones",
-     *      @SWG\Schema(
-     *          @Model(type=PaginatedRepresentation::class, groups={"Default","phone-list"})
+     * @SWG\Get(
+     *      description="Endpoint for the list of available phones",
+     *      produces={"application/hal+json"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Returns the list of phones",
+     *          @SWG\Schema(
+     *              @Model(type=PaginatedRepresentation::class, groups={"Default","phone-list"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Page number to return.",
+     *          type="integer",
+     *          default=1
+     *      ),
+     *      @SWG\Parameter(
+     *          name="limit",
+     *          in="query",
+     *          description="Maximum number of items to return per page.",
+     *          type="integer",
+     *          default=5
      *      )
-     * )
-     * @SWG\Parameter(
-     *      name="page",
-     *      in="query",
-     *      description="Page number to return.",
-     *      type="integer",
-     *      default=1
-     * )
-     * @SWG\Parameter(
-     *      name="limit",
-     *      in="query",
-     *      description="Maximum number of items to return per page.",
-     *      type="integer",
-     *      default=5
      * )
      * @SWG\Tag(name="Phones")
      * @Security(name="Bearer")
@@ -58,19 +62,23 @@ class PhoneController extends AbstractController
 
     /**
      * @Route("/api/phones/{id}", name="api_phone_details", methods={"GET"})
-     * @SWG\Response(
-     *      response=200,
-     *      description="Returns a specific phone detail.",
-     *      @SWG\Schema(
-     *          @Model(type=Phone::class, groups={"phone-details"})
+     * @SWG\Get(
+     *      description="Endpoint for a specific phone's details",
+     *      produces={"application/hal+json"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Returns a specific phone detail.",
+     *          @SWG\Schema(
+     *              @Model(type=Phone::class, groups={"phone-details"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Id of the phone",
+     *          required=true,
+     *          type="integer",
      *      )
-     * )
-     * @SWG\Parameter(
-     *      name="id",
-     *      in="path",
-     *      description="Id of the phone",
-     *      required=true,
-     *      type="integer",
      * )
      * @SWG\Tag(name="Phones")
      * @Security(name="Bearer")

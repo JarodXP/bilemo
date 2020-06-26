@@ -33,6 +33,7 @@ class Company implements UserInterface
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )
+     * @Groups({"credentials"})
      */
     private string $email;
 
@@ -56,6 +57,7 @@ class Company implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"credentials"})
      */
     private string $password;
 

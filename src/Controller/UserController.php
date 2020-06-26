@@ -33,26 +33,30 @@ class UserController extends AbstractController
      * @param  mixed $request
      * @return void
      *
-     * @SWG\Response(
-     *      response=200,
-     *      description="Returns the list of users owned by the current company",
-     *      @SWG\Schema(
-     *          @Model(type=PaginatedRepresentation::class, groups={"Default","users-list"})
+     * @SWG\Get(
+     *      description="Endpoint for the list of users corresponding to the company",
+     *      produces={"application/hal+json"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Returns the list of users owned by the current company",
+     *          @SWG\Schema(
+     *              @Model(type=PaginatedRepresentation::class, groups={"Default","users-list"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Page number to return.",
+     *          type="integer",
+     *          default=1
+     *      ),
+     *      @SWG\Parameter(
+     *          name="limit",
+     *          in="query",
+     *          description="Maximum number of items to return per page.",
+     *          type="integer",
+     *          default=5
      *      )
-     * )
-     * @SWG\Parameter(
-     *      name="page",
-     *      in="query",
-     *      description="Page number to return.",
-     *      type="integer",
-     *      default=1
-     * )
-     * @SWG\Parameter(
-     *      name="limit",
-     *      in="query",
-     *      description="Maximum number of items to return per page.",
-     *      type="integer",
-     *      default=5
      * )
      * @SWG\Tag(name="Users")
      * @Security(name="Bearer")
@@ -72,19 +76,23 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      *
-     * @SWG\Response(
-     *      response=200,
-     *      description="Returns a specific user detail.",
-     *      @SWG\Schema(
-     *          @Model(type=User::class, groups={"user-details"})
+     * @SWG\Get(
+     *      description="Endpoint for a specific user's details",
+     *      produces={"application/hal+json"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Returns a specific user detail.",
+     *          @SWG\Schema(
+     *              @Model(type=User::class, groups={"user-details"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Id of the user",
+     *          required=true,
+     *          type="integer",
      *      )
-     * )
-     * @SWG\Parameter(
-     *      name="id",
-     *      in="path",
-     *      description="Id of the user",
-     *      required=true,
-     *      type="integer",
      * )
      * @SWG\Tag(name="Users")
      * @Security(name="Bearer")
@@ -110,23 +118,29 @@ class UserController extends AbstractController
      * @param  mixed $request
      * @return void
      *
-     * @SWG\Response(
-     *      response=201,
-     *      description="Adds a new user.",
-     *      @SWG\Schema(
-     *          @Model(type=User::class, groups={"user-details"})
+     * @SWG\Post(
+     *      description="Endpoint for adding a new user",
+     *      produces={"application/hal+json"},
+     *      consumes={"application/json"},
+     *      @SWG\Response(
+     *          response=201,
+     *          description="Adds a new user.",
+     *          @SWG\Schema(
+     *              @Model(type=User::class, groups={"user-details"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="userForm",
+     *          in="body",
+     *          description="Details of the user",
+     *          required=true,
+     *          type="object",
+     *          @Model(type=UserType::class)
      *      )
      * )
-     * @SWG\Parameter(
-     *      name="userForm",
-     *      in="body",
-     *      description="Details of the user",
-     *      required=true,
-     *      type="object",
-     *      @Model(type=UserType::class)
-     * )
-     * @SWG\Tag(name="Users")
+     * @SWG\Tag(name="Users"),
      * @Security(name="Bearer")
+     *
      */
     public function addUser(Request $request, UrlGeneratorInterface $urlGeneratorInterface)
     {
@@ -183,22 +197,27 @@ class UserController extends AbstractController
      * @param  mixed $user
      * @return void
      *
-     * @SWG\Response(
-     *      response=200,
-     *      description="Removes the specified user.",
-     *      @SWG\Schema(
-     *          @Model(type=User::class, groups={"user-details"})
+     * @SWG\Delete(
+     *      description="Endpoint for removing a user that you own",
+     *      produces={"application/hal+json"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Removes the specified user.",
+     *          @SWG\Schema(
+     *              @Model(type=User::class, groups={"user-details"})
+     *          )
+     *      ),
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Id of the user",
+     *          required=true,
+     *          type="integer",
      *      )
-     * )
-     * @SWG\Parameter(
-     *      name="id",
-     *      in="path",
-     *      description="Id of the user",
-     *      required=true,
-     *      type="integer",
      * )
      * @SWG\Tag(name="Users")
      * @Security(name="Bearer")
+     *
      */
     public function removeUser(Request $request, User $user, UrlGeneratorInterface $urlGeneratorInterface)
     {
