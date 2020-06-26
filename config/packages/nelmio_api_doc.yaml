@@ -16,6 +16,33 @@ nelmio_api_doc:
         security:
             - Bearer: []
 
+        paths:
+            /api/login_check:
+                post:
+                    description: Login URI
+                    produces: [application/json]
+                    responses:
+                        200: 
+                            description: The bearer token to include in Authorization header
+                            schema: 
+                                type: string
+                    parameters:
+                        credentials: 
+                            name: credentials
+                            in: body
+                            description: Your email and password
+                            required: true
+                            schema:
+                                type: object
+                                properties:
+                                    email:
+                                        type: string
+                                        format: email
+                                    password:
+                                        type: string
+                                        format: password
+                    tags: [Authentication]
+
     areas: # to filter documented areas
         default:
             path_patterns:
