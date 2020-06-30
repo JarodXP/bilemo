@@ -18,6 +18,9 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Hateoas\Representation\PaginatedRepresentation;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class PhoneController extends AbstractController
 {
@@ -51,13 +54,29 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phones")
      * @Security(name="Bearer")
      */
-    public function phonesList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
+    public function phonesList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister, CacheInterface $cache)
     {
-        $repo = $this->getDoctrine()->getManager()->getRepository(Phone::class);
+        //Sets item name corresponding to the request parameters
+        $itemName = 'phone-list';
+        
+        if ($request->query->get('page') != null) {
+            $itemName .= '-'.$request->query->get('page');
+        }
 
-        $json = $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'phone-list']);
+        if ($request->query->get('limit') != null) {
+            $itemName .= '-'.$request->query->get('limit');
+        }
 
-        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
+        //Gets phone list from cache in priority
+        $phoneList = $cache->get($itemName, function (ItemInterface $item) use ($request, $lister) {
+            $item->expiresAfter(120);
+
+            $repo = $this->getDoctrine()->getManager()->getRepository(Phone::class);
+
+            return $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'phone-list']);
+        });
+
+        return new Response($phoneList, 200, ['Content-Type' => 'application/hal+json']);
     }
 
     /**
@@ -83,15 +102,20 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phones")
      * @Security(name="Bearer")
      */
-    public function phoneDetails(Phone $phone, UrlGeneratorInterface $urlGeneratorInterface)
+    public function phoneDetails(Phone $phone, UrlGeneratorInterface $urlGeneratorInterface, CacheInterface $cache)
     {
-        //Use Hateoas builder to serialize
-        $hateoas = HateoasBuilder::create()
-                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
-                ->build();
+        //Gets phone details from cache in priority
+        $serializedPhoneDetails = $cache->get('phone'.'-'.$phone->getId(), function (ItemInterface $item) use ($urlGeneratorInterface, $phone) {
+            $item->expiresAfter(3600);
+            
+            //Use Hateoas builder to serialize
+            $hateoas = HateoasBuilder::create()
+                    ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                    ->build();
 
-        $json = $hateoas->serialize($phone, 'json', SerializationContext::create()->setGroups(['groups' => 'phone-details']));
-
-        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
+            return $hateoas->serialize($phone, 'json', SerializationContext::create()->setGroups(['groups' => 'phone-details']));
+        });
+        
+        return new Response($serializedPhoneDetails, 200, ['Content-Type' => 'application/hal+json']);
     }
 }

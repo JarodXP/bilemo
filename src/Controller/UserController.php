@@ -25,6 +25,8 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Hateoas\Representation\PaginatedRepresentation;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class UserController extends AbstractController
 {
@@ -61,14 +63,30 @@ class UserController extends AbstractController
      * @SWG\Tag(name="Users")
      * @Security(name="Bearer")
      */
-    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister)
+    public function usersList(Request $request, UrlGeneratorInterface $urlGeneratorInterface, HateoasItemLister $lister, CacheInterface $cache)
     {
-        //Sets the repository
-        $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
+        //Sets item name corresponding to the request parameters
+        $itemName = 'users-list';
+        
+        if ($request->query->get('page') != null) {
+            $itemName .= '-'.$request->query->get('page');
+        }
 
-        $json = $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'users-list']);
+        if ($request->query->get('limit') != null) {
+            $itemName .= '-'.$request->query->get('limit');
+        }
 
-        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
+        //Gets the users list from cache in priority
+        $serializedUserList = $cache->get($itemName, function (ItemInterface $item) use ($lister, $request) {
+            $item->expiresAfter(60);
+
+            //Sets the repository
+            $repo = $this->getDoctrine()->getManager()->getRepository(User::class);
+
+            return $lister->getHalJsonResponse($request, $repo, 'api_phones_list', ['Default', 'users-list']);
+        });
+
+        return new Response($serializedUserList, 200, ['Content-Type' => 'application/hal+json']);
     }
    
     /**
@@ -97,20 +115,26 @@ class UserController extends AbstractController
      * @SWG\Tag(name="Users")
      * @Security(name="Bearer")
      */
-    public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface)
+    public function userDetails(User $user, UrlGeneratorInterface $urlGeneratorInterface, CacheInterface $cache)
     {
         if (!$this->isGranted(UserVoter::EDIT, $user)) {
             throw new NotOwnerException("You are not allowed to view this user's details");
         }
 
-        //Use Hateoas builder to serialize
-        $hateoas = HateoasBuilder::create()
-                ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
-                ->build();
+        //Gets user details from cache in priority
+        $serializeduser = $cache->get('user'.$user->getId(), function (ItemInterface $item) use ($user, $urlGeneratorInterface) {
+            $item->expiresAfter(3600);
 
-        $json = $hateoas->serialize($user, 'json', SerializationContext::create()->setGroups(['groups' => 'user-details']));
+            //Use Hateoas builder to serialize
+            $hateoas = HateoasBuilder::create()
+                    ->setUrlGenerator(null, new SymfonyUrlGenerator($urlGeneratorInterface))
+                    ->build();
 
-        return new Response($json, 200, ['Content-Type' => 'application/hal+json']);
+            return $hateoas->serialize($user, 'json', SerializationContext::create()->setGroups(['groups' => 'user-details']));
+        });
+
+    
+        return new Response($serializeduser, 200, ['Content-Type' => 'application/hal+json']);
     }
  
     /**
